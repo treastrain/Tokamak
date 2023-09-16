@@ -117,6 +117,13 @@ public enum ViewBuilder {
 // swiftlint:disable large_tuple
 // swiftlint:disable function_parameter_count
 
+#if swift(>=5.9)
+public extension ViewBuilder {
+  static func buildBlock<each Content: View>(_ content: repeat each Content) -> TupleView<(repeat each Content)> {
+    TupleView((repeat each content))
+  }
+}
+#else
 public extension ViewBuilder {
   static func buildBlock<C0, C1>(_ c0: C0, _ c1: C1) -> TupleView<(C0, C1)>
     where C0: View, C1: View
@@ -243,3 +250,4 @@ public extension ViewBuilder {
     TupleView(c0, c1, c2, c3, c4, c5, c6, c7, c8, c9)
   }
 }
+#endif

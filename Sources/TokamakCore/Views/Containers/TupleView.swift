@@ -24,6 +24,7 @@ public struct TupleView<T>: _PrimitiveView {
   let _children: [AnyView]
   private let visit: (ViewVisitor) -> ()
 
+  @_disfavoredOverload
   public init(_ value: T) {
     self.value = value
     _children = []
@@ -44,6 +45,16 @@ public struct TupleView<T>: _PrimitiveView {
     visit(visitor)
   }
 
+  #if swift(>=5.9)
+  init<each Content: View>(_ v: (repeat each Content)) where T == (repeat each Content) {
+    var children: [AnyView] = []
+    func append<V: View>(_ view: V) {
+      children.append(.init(view))
+    }
+    repeat append(each v)
+    self.init(v, children: children)
+  }
+  #else
   init<T1: View, T2: View>(_ v1: T1, _ v2: T2) where T == (T1, T2) {
     value = (v1, v2)
     _children = [AnyView(v1), AnyView(v2)]
@@ -263,6 +274,7 @@ public struct TupleView<T>: _PrimitiveView {
       $0.visit(v10)
     }
   }
+  #endif
 }
 
 extension TupleView: GroupView {
